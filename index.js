@@ -52,6 +52,10 @@ module.exports = function (aws, options) {
       client.putBuffer(file.contents, uploadPath, headers, function(err, res) {
         if (err || res.statusCode !== 200) {
           gutil.log(gutil.colors.red('[FAILED]', file.path + " -> " + uploadPath + ' (Got error: ' + err + '  or got HTTP status ' + res.statusCode + ' and response: ' + res.body + ')'));
+          if (options.failOnError) {
+            var message = err ? err : 'Failed to upload to s3 with response code: ' + res.statusCode;
+            throw new Error(message);
+          }
         } else {
           gutil.log(gutil.colors.green('[SUCCESS]', file.path + " -> " + uploadPath));
           res.resume();
